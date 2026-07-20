@@ -1,0 +1,40 @@
+name: Update Calendar Information
+on:
+  schedule:
+    - cron: '0 15 * * 0' # Runs at 15:00 UTC Sunday, which is 03:00 AM Monday NZST
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  update-calendar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install requests icalendar
+
+      - name: Run parser
+        run: |
+          python scripts/parse_calendar.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          # Only commit if there are changes
+          if [[ -n $(git status -s) ]]; then
+            git add current_week.json
+            git commit -m "Update calendar data"
+            git push
+          else
+            echo "No changes to commit"
+          fi
