@@ -1,6 +1,7 @@
 import requests
 from icalendar import Calendar
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import json
 import os
 import re
@@ -9,7 +10,7 @@ import re
 ICS_URL = "https://burnside.school.kiwi/ics/f75540d590cb0cf8656dfbd759fac6e6.ics"
 
 def get_current_monday():
-    today = datetime.now()
+    today = datetime.now(ZoneInfo("Pacific/Auckland"))
     monday = today - timedelta(days=today.weekday())
     return monday.date()
 
